@@ -10,7 +10,7 @@ import Healthcare.demo.model.Patient;
 import Healthcare.demo.service.PatientService;
 
 @RestController
-//@CrossOrigin("http://localhost:3000")
+@CrossOrigin("http://localhost:5173/")
 @RequestMapping("/api/patients")
 public class PatientController {
 
