@@ -12,7 +12,7 @@ import Healthcare.demo.service.AdminService;
 import java.util.List;
 
 @RestController
-@CrossOrigin("http://localhost:3000")
+@CrossOrigin("http://localhost:5173/")
 @RequestMapping("/api/admins")
 public class AdminController {
     
