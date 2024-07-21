@@ -40,6 +40,10 @@ public class AppointmentController {
 
     @PostMapping
     public ResponseEntity<ApiResponse> createAppointment(@RequestBody Appointment appointment) {
+        if (service.appointmentExists(appointment.getId())) {
+            ApiResponse response = new ApiResponse("Appointment already exists", false);
+            return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+        }
         service.createAppointment(appointment);
         ApiResponse response = new ApiResponse("Appointment created successfully", true);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
@@ -47,7 +51,7 @@ public class AppointmentController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse> updateAppointment(@PathVariable Long id, @RequestBody Appointment appointment) {
-        if (!service.appointmentExists(id) || id != appointment.getId()) {
+        if (!service.appointmentExists(id) || !id.equals(appointment.getId())) {
             ApiResponse response = new ApiResponse("Appointment not found", false);
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         }

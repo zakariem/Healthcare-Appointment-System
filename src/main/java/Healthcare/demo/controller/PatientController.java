@@ -1,13 +1,14 @@
 package Healthcare.demo.controller;
 
-import java.util.List;
-import java.util.Optional;
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import Healthcare.demo.model.ApiResponse;
 import Healthcare.demo.model.Patient;
 import Healthcare.demo.service.PatientService;
+
+import java.util.List;
 
 @RestController
 @CrossOrigin("http://localhost:5173/")
@@ -30,9 +31,9 @@ public class PatientController {
     // Get patient by ID
     @GetMapping("/{id}")
     public ResponseEntity<Object> getPatientById(@PathVariable Long id) {
-        Optional<Patient> patient = service.getPatientById(id);
-        if (patient.isPresent()) {
-            return new ResponseEntity<>(patient.get(), HttpStatus.OK);
+        Patient patient = service.getPatientById(id);
+        if (patient != null) {
+            return new ResponseEntity<>(patient, HttpStatus.OK);
         } else {
             ApiResponse response = new ApiResponse("Patient not found", false);
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
@@ -42,7 +43,8 @@ public class PatientController {
     // Create new patient
     @PostMapping
     public ResponseEntity<ApiResponse> createPatient(@RequestBody Patient patient) {
-        if (service.patientExists(patient.getId())) {
+        // Check if the patient already exists based on other unique fields (like email)
+        if (service.patientExists(patient.getEmail())) {
             ApiResponse response = new ApiResponse("Patient already exists", false);
             return new ResponseEntity<>(response, HttpStatus.CONFLICT);
         }
@@ -54,7 +56,7 @@ public class PatientController {
     // Update patient
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse> updatePatient(@PathVariable Long id, @RequestBody Patient patient) {
-        if (!service.patientExists(id) || id != patient.getId()) {
+        if (!service.patientExists(id) || !id.equals(patient.getId())) {
             ApiResponse response = new ApiResponse("Patient not found", false);
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         }

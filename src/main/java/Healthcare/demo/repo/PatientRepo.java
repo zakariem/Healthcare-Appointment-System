@@ -7,5 +7,5 @@ import Healthcare.demo.model.Patient;
 
 @Repository
 public interface PatientRepo extends JpaRepository<Patient, Long> {
-    
+    boolean existsByEmail(String email);
 }

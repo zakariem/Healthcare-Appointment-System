@@ -25,12 +25,10 @@ public class AdminService {
     }
 
     public Admin createAdmin(Admin admin) {
-        // For testing, just save the admin with the provided password (no hashing)
         return repo.save(admin);
     }
 
     public Admin updateAdmin(Admin admin) {
-        // For testing, update the admin (no hashing needed)
         return repo.save(admin);
     }
 

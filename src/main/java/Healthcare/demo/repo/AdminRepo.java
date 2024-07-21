@@ -9,4 +9,5 @@ import Healthcare.demo.model.Admin;
 public interface AdminRepo extends JpaRepository<Admin, Long> {
     // Custom query methods can be added here if needed
     Admin findByEmail(String email);
+    boolean existsByEmail(String email);
 }
