@@ -46,7 +46,7 @@ public class DoctorController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse> updateDoctor(@PathVariable Long id, @RequestBody Doctor doctor) {
-        if (!service.doctorExists(id) || id != doctor.getId()) {
+        if (!service.doctorExists(id)) {
             ApiResponse response = new ApiResponse("Doctor not found", false);
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         }

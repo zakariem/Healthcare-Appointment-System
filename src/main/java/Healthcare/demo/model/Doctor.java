@@ -29,14 +29,11 @@ public class Doctor {
     @Column(nullable = false, unique = true, length = 100)
     private String email;
 
-    @Column(length = 500)
-    private String description;
-
     @Column(nullable = true, updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
 
     @Column(nullable = true)
-    private LocalDateTime updatedAt = LocalDateTime.now();
+    private LocalDateTime updatedAt;
 
     @PrePersist
     protected void onCreate() {

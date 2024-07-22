@@ -1,75 +1,68 @@
 package Healthcare.demo.controller;
 
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import Healthcare.demo.dto.AppointmentDTO;
 import Healthcare.demo.model.ApiResponse;
-import Healthcare.demo.model.Appointment;
 import Healthcare.demo.service.AppointmentService;
 
 import java.util.List;
 
 @RestController
-@CrossOrigin("http://localhost:5173/")
 @RequestMapping("/api/appointments")
 public class AppointmentController {
 
-    private final AppointmentService service;
+    private final AppointmentService appointmentService;
 
-    public AppointmentController(AppointmentService service) {
-        this.service = service;
+    @Autowired
+    public AppointmentController(AppointmentService appointmentService) {
+        this.appointmentService = appointmentService;
     }
 
     @GetMapping
-    public ResponseEntity<List<Appointment>> getAllAppointments() {
-        List<Appointment> appointments = service.getAllAppointments();
-        return new ResponseEntity<>(appointments, HttpStatus.OK);
+    public List<AppointmentDTO> getAllAppointments() {
+        return appointmentService.getAllAppointments();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getAppointmentById(@PathVariable Long id) {
-        Appointment appointment = service.getAppointmentById(id);
-        if (appointment != null) {
-            return new ResponseEntity<>(appointment, HttpStatus.OK);
-        } else {
-            ApiResponse response = new ApiResponse("Appointment not found", false);
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    public ResponseEntity<?> getAppointmentById(@PathVariable Long id) {
+        AppointmentDTO appointmentDTO = appointmentService.getAppointmentById(id);
+        if (appointmentDTO == null) {
+            return ResponseEntity.status(404).body(new ApiResponse("Appointment not found for id: " + id, false));
         }
+        return ResponseEntity.ok(appointmentDTO);
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse> createAppointment(@RequestBody Appointment appointment) {
-        if (service.appointmentExists(appointment.getId())) {
-            ApiResponse response = new ApiResponse("Appointment already exists", false);
-            return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+    public ResponseEntity<ApiResponse> createAppointment(@RequestBody AppointmentDTO appointmentDTO) {
+        try {
+            appointmentService.createAppointment(appointmentDTO);
+            return ResponseEntity.ok(new ApiResponse("Appointment created successfully", true));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(400).body(new ApiResponse(e.getMessage(), false));
         }
-        service.createAppointment(appointment);
-        ApiResponse response = new ApiResponse("Appointment created successfully", true);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse> updateAppointment(@PathVariable Long id, @RequestBody Appointment appointment) {
-        if (!service.appointmentExists(id) || !id.equals(appointment.getId())) {
-            ApiResponse response = new ApiResponse("Appointment not found", false);
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    public ResponseEntity<ApiResponse> updateAppointment(@PathVariable Long id, @RequestBody AppointmentDTO appointmentDTO) {
+        appointmentDTO.setId(id);
+        try {
+            appointmentService.updateAppointment(appointmentDTO);
+            return ResponseEntity.ok(new ApiResponse("Appointment updated successfully", true));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(400).body(new ApiResponse(e.getMessage(), false));
         }
-        appointment.setId(id);
-        service.updateAppointment(appointment);
-        ApiResponse response = new ApiResponse("Appointment updated successfully", true);
-        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse> deleteAppointment(@PathVariable Long id) {
-        if (service.appointmentExists(id)) {
-            service.deleteAppointment(id);
-            ApiResponse response = new ApiResponse("Appointment deleted successfully", true);
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } else {
-            ApiResponse response = new ApiResponse("Appointment not found", false);
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        try {
+            appointmentService.deleteAppointment(id);
+            return ResponseEntity.ok(new ApiResponse("Appointment deleted successfully", true));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(400).body(new ApiResponse(e.getMessage(), false));
         }
     }
 }

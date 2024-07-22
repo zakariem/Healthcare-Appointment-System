@@ -32,9 +32,6 @@ public class Patient {
     @Column(nullable = false, unique = true, length = 100)
     private String email;
 
-    @Column
-    private String description;
-
     @Column(nullable = true, updatable = false)
     private LocalDateTime createdAt;
 
